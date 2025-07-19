@@ -6,6 +6,17 @@ It includes settings such as labels, class names, training hyperparameters,
 paths, and model-specific parameters.
 """
 
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
+SPLIT_DATA_DIR = PROJECT_ROOT / "data" / "split"
+
+IMAGE_SIZE = (224, 224)  # or (128, 128)
+IMAGENET_MEAN = [0.485, 0.456, 0.406]  # Mean for ImageNet normalization
+IMAGENET_STD = [0.229, 0.224, 0.225]  # Std for ImageNet normalization
+
 # Target label (used for decoding or evaluation)
 TARGET_LABEL = "waste_type"
 
@@ -27,14 +38,6 @@ NUMERIC_COLUMNS = [
 CATEGORICAL_COLUMNS = [
     # e.g., "source_location"
 ]
-
-# Paths — optionally used by preprocessing or main pipeline
-DATA_DIR = "data/"
-RAW_DATA_PATH = "data/raw"
-SPLIT_DATA_DIR = "data/split"
-TRAIN_DIR = "data/split/train"
-VAL_DIR = "data/split/val"
-TEST_DIR = "data/split/test"
 
 # Training hyperparameters
 BATCH_SIZE = 32
