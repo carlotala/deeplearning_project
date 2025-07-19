@@ -1,3 +1,7 @@
-pandas
-numpy
-pytorch
+pandas==2.3.1
+numpy==2.0.2
+torch==2.7.1
+torchvision==0.22.1
+ipykernel==6.29.5
+matplotlib==3.9.4
+scikit-learn==1.6.1
