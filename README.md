@@ -1,7 +1,7 @@
 # CS 7643 - Deep Learning Final Project: Deep Learning for Waste Classification and Recycling
 
 ## Description
-With the increasing emphasis on sustainability and waste management, automating the classification of waste materials plays a crucial role in improving recycling efficiency. This project aims to develop a deep learning model capable of automatically identifying various types of waste, such as paper, plastic, metal, glass, and cardboard, from image data. The project will leverage a pre-existing dataset, containing labeled images of different types of waste. The goal is to explore various deep learning architectures, including custom CNNs and transfer learning techniques, to achieve a high level of accuracy in waste classification and object detection. This project could have far-reaching applications in waste management systems, landfill monitoring, and environmental education.
+With the increasing emphasis on sustainability and waste management, automating the classification of waste materials plays a crucial role in improving recycling efficiency. This project aims to develop a deep learning model capable of automatically identifying various types of waste, such as paper, plastic, metal, glass, and cardboard, from image data. The project will leverage a pre-existing dataset, containing labeled images of different types of waste. The goal is to explore various deep learning architectures, including custom CNNs and transfer learning techniques, to achieve a high level of accuracy in waste classification. This project could have far-reaching applications in waste management systems, landfill monitoring, and environmental education.
 
 ## 🏛 Repository Structure
 
