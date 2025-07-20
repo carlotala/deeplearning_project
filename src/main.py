@@ -24,12 +24,12 @@ from src.config.config_file import (
 )
 from src.preprocessing.preprocessing import data_preparation
 from src.models.SimpleCNN import SimpleCNN
-from src.models.model_template import VGGTransferModel, ResNetTransferModel
+from src.models.VGGTransferModel import VGGTransferModel
+from src.models.ResNetTransferModel import ResNetTransferModel
 from src.train.train import train
 from src.predict.predict import predict
-from src.evaluate.evaluate import evaluate
-from src.train.helpers.losses import get_criterion
 from src.utils.logger import logger_all as logger
+from src.evaluate.analyze import analyze_classification
 
 
 def main(model_type: str) -> None:
@@ -91,11 +91,11 @@ def main(model_type: str) -> None:
 
         # 4. Generate predictions on test set
         logger.info("Generating predictions on test set...")
-        test_preds = predict(
+        test_preds, test_probs = predict(
             trained_model,
             test_loader,
             device=DEVICE,
-            return_probs=False
+            return_probs=True
         )
         logger.info(f"Generated {len(test_preds)} test predictions.")
 
@@ -105,7 +105,14 @@ def main(model_type: str) -> None:
         torch.save(trained_model.state_dict(), output_path)
         logger.info(f"Saved model checkpoint: {output_path}")
 
+        # 7. Analyze results
+        logger.info("Analyzing classification results...")
+        class_names = [test_loader.dataset.classes[i] for i in range(len(test_loader.dataset.classes))]
+        metrics = analyze_classification(test_loader.dataset, test_preds, test_probs, class_names)
+
         logger.info("Pipeline finished successfully.")
+
+        return metrics
     except Exception:
         logger.error("Pipeline failed with an exception.", exc_info=True)
         raise
