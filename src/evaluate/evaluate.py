@@ -3,46 +3,47 @@ src/evaluate/evaluate.py
 
 Module to evaluate a trained model using a test set.
 """
-
-# Imports
 import torch
-from sklearn.metrics import classification_report
-
-# Config
 from src.config.config_file import DEVICE
 
-def evaluate(model, dataloader, criterion, device=DEVICE):
+
+def evaluate(model, val_loader, criterion, device=DEVICE):
     """
-    Evaluate model performance on a labeled dataset.
+    Evaluates the model on a validation or test set.
 
-    Args:
-        model: Trained model.
-        dataloader: DataLoader with test/validation data.
-        criterion: Loss function.
-        device: CPU or GPU.
+    Parameters
+    ----------
+    model : torch.nn.Module
+        Trained model.
+    val_loader : DataLoader
+        Validation or test data loader.
+    criterion : loss function
+        The same loss used during training.
+    device : str
+        'cuda' or 'cpu'.
 
-    Returns:
-        Dictionary of evaluation results (e.g., loss, accuracy, metrics).
+    Returns
+    -------
+    tuple
+        Average loss and accuracy percentage.
     """
     model.eval()
-    model.to(device)
-
-    all_preds = []
-    all_labels = []
-    total_loss = 0
+    total_loss = 0.0
+    correct = 0
+    total = 0
 
     with torch.no_grad():
-        for inputs, labels in dataloader:
-            # Move data to device
-            # Forward pass
-            # Compute loss
-            # Accumulate predictions and true labels
-            pass
+        for inputs, labels in val_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            total_loss += loss.item() * inputs.size(0)
 
-    # Compute metrics, print or return them
-    # Optionally generate and save plots
+            preds = torch.argmax(outputs, dim=1)
+            correct += (preds == labels).sum().item()
+            total += labels.size(0)
 
-    return {
-        "loss": total_loss,
-        "other_metrics": "to be defined"
-    }
+    avg_loss = total_loss / total
+    accuracy = (correct / total) * 100
+
+    return avg_loss, accuracy
