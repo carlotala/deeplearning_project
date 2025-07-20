@@ -12,9 +12,26 @@ from src.config.config_file import DEVICE
 
 def predict(model, dataloader, device=DEVICE, return_probs=False):
     """
-    Returns:
-        predictions: List of predicted class indices.
-        (opcional) probabilities: List of probability vectors (lista de listas).
+    Perform inference on new data using the trained classification model.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The trained PyTorch classification model.
+    dataloader : torch.utils.data.DataLoader
+        DataLoader providing input batches. Each batch can be a tensor of inputs or a tuple/list
+        where the first element is inputs (labels, if present, are ignored).
+    device : str or torch.device, optional (default=DEVICE)
+        Device to run inference on ('cpu' or 'cuda').
+    return_probs : bool, optional (default=False)
+        If True, also return the probability distributions for each prediction.
+
+    Returns
+    -------
+    predictions : List[int]
+        List of predicted class indices for each sample.
+    probabilities : List[List[float]], optional
+        Probability vectors for each sample if return_probs is True, each summing to 1 across classes.
     """
     model.eval()
     model.to(device)
