@@ -1,13 +1,20 @@
+"""
+src/models/VGGTransferModel.py
+
+Implementation of a transfer learning model using VGG16 as the backbone.
+"""
 import torch
 import torch.nn as nn
 import torchvision.models as models
+
+from src.config.config_file import NUM_CLASSES
 
 
 class VGGTransferModel(nn.Module):
     """
     Transfer Learning model using VGG16 backbone for classification.
     """
-    def __init__(self, num_classes: int):
+    def __init__(self, num_classes: int = NUM_CLASSES):
         super().__init__()
         # Load pretrained VGG16 and freeze features
         vgg = models.vgg16(pretrained=True)
@@ -19,8 +26,8 @@ class VGGTransferModel(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((7, 7))
         flatten_dim = 512 * 7 * 7
 
-        # Classification head
-        self.class_head = nn.Sequential(
+        # Classification
+        self.classifier = nn.Sequential(
             nn.Linear(flatten_dim, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),

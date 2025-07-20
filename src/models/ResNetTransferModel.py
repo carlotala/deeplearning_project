@@ -1,7 +1,14 @@
+"""
+src/models/ResNetTransferModel.py
 
+Implementation of a transfer learning model using ResNet50 as the backbone.
+"""
 import torch
 import torch.nn as nn
 import torchvision.models as models
+
+from src.config.config_file import NUM_CLASSES
+
 
 class ResNetTransferModel(nn.Module):
     """
@@ -10,7 +17,7 @@ class ResNetTransferModel(nn.Module):
       - bbox: Tensor of shape (batch_size, 4), values in [0,1]
       - class_logits: Tensor of shape (batch_size, num_classes)
     """
-    def __init__(self, num_classes: int):
+    def __init__(self, num_classes: int = NUM_CLASSES):
         super().__init__()
         # Load pretrained ResNet50 and freeze layers
         resnet = models.resnet50(pretrained=True)
@@ -22,8 +29,8 @@ class ResNetTransferModel(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         flatten_dim = resnet.fc.in_features  # 2048
 
-        # Classification head
-        self.class_head = nn.Sequential(
+        # Classification
+        self.classifier = nn.Sequential(
             nn.Linear(flatten_dim, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5),
