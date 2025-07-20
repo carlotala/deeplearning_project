@@ -20,6 +20,7 @@ from src.config.config_file import (
     LEARNING_RATE,
     RAW_DATA_DIR,
     SPLIT_DATA_DIR,
+    OUTPUT_MODELS_DIR
 )
 from src.preprocessing.preprocessing import data_preparation
 from src.models.SimpleCNN import SimpleCNN
@@ -76,31 +77,31 @@ def main(model_type: str) -> None:
 
         # 3. Train model
         logger.info("Starting training...")
-        criterion = get_criterion("cross_entropy")
         trained_model = train(
             model,
             train_loader,
             val_loader,
+            loss_name="cross_entropy",
+            optimizer_name="adam",
             lr=LEARNING_RATE,
             device=DEVICE,
             epochs=EPOCHS,
         )
         logger.info("Training completed.")
 
-        # 4. Evaluate on validation
-        logger.info("Evaluating on validation set...")
-        val_loss, val_acc = evaluate(trained_model, val_loader, criterion, device=DEVICE)
-        logger.info(f"Validation Loss: {val_loss:.4f}, Accuracy: {val_acc:.2f}%")
-
-        # 5. Evaluate on test set
-        logger.info("Evaluating on test set...")
-        test_loss, test_acc = evaluate(trained_model, test_loader, criterion, device=DEVICE)
-        logger.info(f"Test Loss: {test_loss:.4f}, Accuracy: {test_acc:.2f}%")
+        # 4. Generate predictions on test set
+        logger.info("Generating predictions on test set...")
+        test_preds = predict(
+            trained_model,
+            test_loader,
+            device=DEVICE,
+            return_probs=False
+        )
+        logger.info(f"Generated {len(test_preds)} test predictions.")
 
         # 6. Save checkpoint
-        output_dir = os.path.join("outputs", "models")
-        os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, f"model_{model_type}.pth")
+        os.makedirs(OUTPUT_MODELS_DIR, exist_ok=True)
+        output_path = os.path.join(OUTPUT_MODELS_DIR, f"model_{model_type}.pth")
         torch.save(trained_model.state_dict(), output_path)
         logger.info(f"Saved model checkpoint: {output_path}")
 

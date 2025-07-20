@@ -12,6 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
 SPLIT_DATA_DIR = PROJECT_ROOT / "data" / "split"
+OUTPUT_MODELS_DIR = PROJECT_ROOT / "outputs" / "models"
 
 IMAGE_SIZE = (224, 224)  # or (128, 128)
 IMAGENET_MEAN = [0.485, 0.456, 0.406]  # Mean for ImageNet normalization
