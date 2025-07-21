@@ -74,20 +74,36 @@ def main(model_type: str) -> None:
         else:
             logger.error(f"Unknown model type: {model_type}")
             return
+        
+        # Check if a pre-trained model exists
+        trained_model = None
+        os.makedirs(OUTPUT_MODELS_DIR, exist_ok=True)
+        output_path = os.path.join(OUTPUT_MODELS_DIR, f"model_{model_type}.pth")
+        if os.path.exists(output_path):
+            logger.info(f"Loading existing model checkpoint from {output_path}")
+            model.load_state_dict(torch.load(output_path))
+            trained_model = model
 
         # 3. Train model
         logger.info("Starting training...")
-        trained_model = train(
-            model,
-            train_loader,
-            val_loader,
-            loss_name="cross_entropy",
-            optimizer_name="adam",
-            lr=LEARNING_RATE,
-            device=DEVICE,
-            epochs=EPOCHS,
-        )
-        logger.info("Training completed.")
+        if trained_model is None:
+            logger.info("No pre-trained model found, starting from scratch.")
+            trained_model = train(
+                model,
+                train_loader,
+                val_loader,
+                loss_name="cross_entropy",
+                optimizer_name="adam",
+                lr=LEARNING_RATE,
+                device=DEVICE,
+                epochs=EPOCHS,
+            )
+            logger.info("Training completed.")
+            # 6. Save checkpoint
+            torch.save(trained_model.state_dict(), output_path)
+            logger.info(f"Saved model checkpoint: {output_path}")
+        else:
+            logger.info("Using pre-trained model for further training.")
 
         # 4. Generate predictions on test set
         logger.info("Generating predictions on test set...")
@@ -99,16 +115,13 @@ def main(model_type: str) -> None:
         )
         logger.info(f"Generated {len(test_preds)} test predictions.")
 
-        # 6. Save checkpoint
-        os.makedirs(OUTPUT_MODELS_DIR, exist_ok=True)
-        output_path = os.path.join(OUTPUT_MODELS_DIR, f"model_{model_type}.pth")
-        torch.save(trained_model.state_dict(), output_path)
-        logger.info(f"Saved model checkpoint: {output_path}")
-
         # 7. Analyze results
         logger.info("Analyzing classification results...")
         class_names = [test_loader.dataset.classes[i] for i in range(len(test_loader.dataset.classes))]
-        metrics = analyze_classification(test_loader.dataset, test_preds, test_probs, class_names)
+        y_true = []
+        for _, labels in test_loader:
+            y_true.extend(labels.numpy())
+        metrics = analyze_classification(y_true, test_preds, test_probs, class_names)
 
         logger.info("Pipeline finished successfully.")
 

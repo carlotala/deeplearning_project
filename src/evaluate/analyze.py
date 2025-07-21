@@ -154,5 +154,6 @@ def analyze_classification(y_true, y_pred, y_prob=None, class_names=None, averag
     if plot and class_names is not None:
         plot_confusion_matrix(metrics["confusion_matrix"], class_names, normalize=True)
         if y_prob is not None:
+            y_prob = np.array(y_prob)
             plot_roc_curve(y_true, y_prob, class_names)
     return metrics
