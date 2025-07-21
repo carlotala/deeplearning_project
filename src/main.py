@@ -32,7 +32,7 @@ from src.utils.logger import logger_all as logger
 from src.evaluate.analyze import analyze_classification
 
 
-def main(model_type: str) -> None:
+def main(model_type: str, epochs=EPOCHS) -> None:
     """
     Load and preprocess data, train the specified model, evaluate, and save the checkpoint.
 
@@ -96,7 +96,7 @@ def main(model_type: str) -> None:
                 optimizer_name="adam",
                 lr=LEARNING_RATE,
                 device=DEVICE,
-                epochs=EPOCHS,
+                epochs=epochs,
             )
             logger.info("Training completed.")
             # 6. Save checkpoint
