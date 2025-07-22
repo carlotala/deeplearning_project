@@ -19,7 +19,8 @@ DEEPLEARNING_PROJECT
 │   ├── config/
 │   │   └── config_file.py           --> Project-level configuration (e.g., class names, device, paths)
 │   ├── evaluate/
-│   │   └── evaluate.py              --> Evaluation logic for trained models
+│   │   ├── evaluate.py              --> Evaluation logic for trained models
+│   │   └── analyze.py               --> Commpute futher insights for trained models
 │   ├── models/
 │   │   └── model_template.py        --> Model definition (e.g., CNN or custom architecture)
 │   ├── predict/
@@ -29,6 +30,9 @@ DEEPLEARNING_PROJECT
 │   │   │   └── data_helpers.py      --> Preprocessing utilities (e.g., data split, augmentation)
 │   │   └── preprocessing.py         --> Data preparation workflow (transforms, loaders, etc.)
 │   ├── train/
+│   │   ├── helpers/
+│   │   │   └── losses.py            --> Define and retrieve loss functions
+│   │   │   └── optimizers.py        --> Define and retrieve optimizers
 │   │   └── train.py                 --> Training logic (training loop, optimizer, loss)
 │   ├── utils/
 │   │   ├── common.py                --> General utilities
@@ -36,11 +40,10 @@ DEEPLEARNING_PROJECT
 │   │   └── plots.py                 --> Plotting functions for results or metrics
 │   └── main.py                      --> Project orchestration: from preprocessing to training and evaluation
 │
-├── outputs/                         --> Saved models, logs, predictions
+├── outputs/                         --> Saved models, logs
 │   ├── models/
-│   ├── logs/
-│   └── results/
-│
+│   └── logs/
+|
 ├── requirements.txt                 --> Project dependencies
 ├── .gitignore                       --> Files and folders to ignore in git
 └── README.md                        --> Project overview (this file)
@@ -68,6 +71,9 @@ pip install -r requirements.txt
 All training, evaluation and analysis are integrated in the `final_project.ipynb` notebook.
 
 Open it in Jupyter or VSCode and run each section interactively.
+
+> **Note**
+> We have already executed the notebook to train the models. You may retrieve the model parameters from this [Drive folder(https://drive.google.com/drive/folders/1Et1I-kvZJ_0E14s20XY1bf-Hy1gc4zfz?usp=sharing).
 
 
 ## 🤝 Contributing
