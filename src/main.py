@@ -24,15 +24,15 @@ from src.config.config_file import (
 )
 from src.preprocessing.preprocessing import data_preparation
 from src.models.SimpleCNN import SimpleCNN
-from src.models.model_template import VGGTransferModel, ResNetTransferModel
+from src.models.VGGTransferModel import VGGTransferModel
+from src.models.ResNetTransferModel import ResNetTransferModel
 from src.train.train import train
 from src.predict.predict import predict
-from src.evaluate.evaluate import evaluate
-from src.train.helpers.losses import get_criterion
 from src.utils.logger import logger_all as logger
+from src.evaluate.analyze import analyze_classification
 
 
-def main(model_type: str) -> None:
+def main(model_type: str, epochs=EPOCHS) -> None:
     """
     Load and preprocess data, train the specified model, evaluate, and save the checkpoint.
 
@@ -74,38 +74,58 @@ def main(model_type: str) -> None:
         else:
             logger.error(f"Unknown model type: {model_type}")
             return
+        
+        # Check if a pre-trained model exists
+        trained_model = None
+        os.makedirs(OUTPUT_MODELS_DIR, exist_ok=True)
+        output_path = os.path.join(OUTPUT_MODELS_DIR, f"model_{model_type}.pth")
+        if os.path.exists(output_path):
+            logger.info(f"Loading existing model checkpoint from {output_path}")
+            model.load_state_dict(torch.load(output_path))
+            trained_model = model
 
         # 3. Train model
         logger.info("Starting training...")
-        trained_model = train(
-            model,
-            train_loader,
-            val_loader,
-            loss_name="cross_entropy",
-            optimizer_name="adam",
-            lr=LEARNING_RATE,
-            device=DEVICE,
-            epochs=EPOCHS,
-        )
-        logger.info("Training completed.")
+        if trained_model is None:
+            logger.info("No pre-trained model found, starting from scratch.")
+            trained_model = train(
+                model,
+                train_loader,
+                val_loader,
+                loss_name="cross_entropy",
+                optimizer_name="adam",
+                lr=LEARNING_RATE,
+                device=DEVICE,
+                epochs=epochs,
+            )
+            logger.info("Training completed.")
+            # 6. Save checkpoint
+            torch.save(trained_model.state_dict(), output_path)
+            logger.info(f"Saved model checkpoint: {output_path}")
+        else:
+            logger.info("Using pre-trained model for further training.")
 
         # 4. Generate predictions on test set
         logger.info("Generating predictions on test set...")
-        test_preds = predict(
+        test_preds, test_probs = predict(
             trained_model,
             test_loader,
             device=DEVICE,
-            return_probs=False
+            return_probs=True
         )
         logger.info(f"Generated {len(test_preds)} test predictions.")
 
-        # 6. Save checkpoint
-        os.makedirs(OUTPUT_MODELS_DIR, exist_ok=True)
-        output_path = os.path.join(OUTPUT_MODELS_DIR, f"model_{model_type}.pth")
-        torch.save(trained_model.state_dict(), output_path)
-        logger.info(f"Saved model checkpoint: {output_path}")
+        # 7. Analyze results
+        logger.info("Analyzing classification results...")
+        class_names = [test_loader.dataset.classes[i] for i in range(len(test_loader.dataset.classes))]
+        y_true = []
+        for _, labels in test_loader:
+            y_true.extend(labels.numpy())
+        metrics = analyze_classification(y_true, test_preds, test_probs, class_names)
 
         logger.info("Pipeline finished successfully.")
+
+        return metrics
     except Exception:
         logger.error("Pipeline failed with an exception.", exc_info=True)
         raise

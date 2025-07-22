@@ -48,7 +48,8 @@ def train(model, train_loader, val_loader, loss_name="cross_entropy", optimizer_
         model.train()
         running_loss = 0.0
 
-        for inputs, labels in train_loader:
+        for batch_idx, (inputs, labels) in enumerate(train_loader):
+            logger.debug(f"Processing batch {batch_idx + 1}/{len(train_loader)}")
             inputs, labels = inputs.to(device), labels.to(device)
 
             optimizer.zero_grad()
