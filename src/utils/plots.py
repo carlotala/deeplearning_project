@@ -30,6 +30,40 @@ def show_images_per_class(dataset, class_names, samples_per_class=3):
     plt.show()
 
 
+def show_one_image_per_class_grid(dataset, class_names):
+    num_classes = len(class_names)
+    images_per_class = 1  # Solo una imagen por clase
+    rows, cols = 2, 6     # Distribución en 2 filas y 6 columnas
+
+    class_to_img = {}
+    
+    # Recoger una imagen por clase
+    for img, label in dataset:
+        if label not in class_to_img:
+            class_to_img[label] = img
+        if len(class_to_img) == num_classes:
+            break
+
+    # Crear la figura
+    fig, axs = plt.subplots(rows, cols, figsize=(cols * 2, rows * 2))
+
+    for idx, class_idx in enumerate(sorted(class_to_img.keys())):
+        row, col = divmod(idx, cols)
+        ax = axs[row, col]
+        ax.imshow(class_to_img[class_idx])
+        ax.axis("off")
+        ax.set_title(class_names[class_idx])
+
+    # Eliminar ejes no usados (por si acaso)
+    for i in range(rows * cols):
+        if i >= num_classes:
+            row, col = divmod(i, cols)
+            axs[row, col].axis("off")
+
+    plt.tight_layout()
+    plt.show()
+    
+
 def bar_plot(
     labels,
     values,
